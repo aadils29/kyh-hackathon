@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VolunteerConnect - Find Local Opportunities</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: white;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .controls {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .location-section {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .location-input {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .location-input input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      .location-input input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .btn-primary {
+        background: #667eea;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+      }
+
+      .btn-secondary {
+        background: #48bb78;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #38a169;
+        transform: translateY(-2px);
+      }
+
+      .filters {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .filter-group label {
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #4a5568;
+      }
+
+      .filter-group select {
+        padding: 10px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+      }
+
+      .filter-group select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .results {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .results-header {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .results-count {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+      }
+
+      .user-location {
+        opacity: 0.9;
+        font-size: 0.9rem;
+      }
+
+      .opportunities {
+        padding: 20px;
+      }
+
+      .opportunity-card {
+        border: 2px solid #f7fafc;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+
+      .opportunity-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .opportunity-header {
+        display: flex;
+        justify-content: between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .opportunity-title {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .opportunity-title h3 {
+        color: #2d3748;
+        font-size: 1.3rem;
+        margin-bottom: 5px;
+      }
+
+      .organization {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .category-badge {
+        background: #f0f4f8;
+        color: #4a5568;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .opportunity-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #4a5568;
+      }
+
+      .detail-icon {
+        width: 18px;
+        height: 18px;
+        opacity: 0.7;
+      }
+
+      .opportunity-description {
+        color: #2d3748;
+        line-height: 1.6;
+        margin-bottom: 15px;
+      }
+
+      .opportunity-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .btn-small {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+
+      .status-indicator {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #48bb78;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        display: none;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .location-section {
+          flex-direction: column;
+        }
+
+        .filters {
+          grid-template-columns: 1fr;
+        }
+
+        .opportunity-details {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Proxiteer</h1>
+        <p>Find meaningful volunteer opportunities near you</p>
+      </div>
+
+      <div class="controls">
+        <div class="location-section">
+          <div class="location-input">
+            <input
+              type="text"
+              id="locationInput"
+              placeholder="Enter your city or zip code"
+              value="Arlington, VA"
+            />
+          </div>
+          <button class="btn btn-secondary" onclick="getLocation()">
+            Use My Location
+          </button>
+          <button class="btn btn-primary" onclick="searchOpportunities()">
+            Find Opportunities
+          </button>
+        </div>
+
+        <div class="filters">
+          <div class="filter-group">
+            <label for="categoryFilter">Category</label>
+            <select id="categoryFilter" onchange="filterOpportunities()">
+              <option value="">All Categories</option>
+              <option value="education">Education</option>
+              <option value="environment">Environment</option>
+              <option value="health">Health & Wellness</option>
+              <option value="community">Community Service</option>
+              <option value="seniors">Senior Care</option>
+              <option value="animals">Animal Welfare</option>
+              <option value="disaster">Disaster Relief</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="distanceFilter">Distance</label>
+            <select id="distanceFilter" onchange="filterOpportunities()">
+              <option value="10">Within 10 miles</option>
+              <option value="25">Within 25 miles</option>
+              <option value="50">Within 50 miles</option>
+              <option value="100">Within 100 miles</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="timeFilter">Time Commitment</label>
+            <select id="timeFilter" onchange="filterOpportunities()">
+              <option value="">Any Duration</option>
+              <option value="short">1-3 hours</option>
+              <option value="medium">Half day</option>
+              <option value="long">Full day</option>
+              <option value="ongoing">Ongoing</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="dateFilter">When</label>
+            <select id="dateFilter" onchange="filterOpportunities()">
+              <option value="">Anytime</option>
+              <option value="today">Today</option>
+              <option value="weekend">This Weekend</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="results">
+        <div class="results-header">
+          <div class="results-count" id="resultsCount">
+            12 volunteer opportunities found
+          </div>
+          <div class="user-location" id="userLocation">Near Arlington, VA</div>
+        </div>
+
+        <div class="opportunities" id="opportunitiesContainer">
+          <!-- Opportunities will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="status-indicator" id="statusIndicator">
+      <div class="loading"></div>
+      <span>Finding opportunities...</span>
+    </div>
+
+    <script>
+      // Sample data - in real app, this would come from APIs
+      const sampleOpportunities = [
+        {
+          id: 1,
+          title: "Food Pantry Volunteer",
+          organization: "Arlington Food Assistance Center",
+          category: "community",
+          description:
+            "Help sort and distribute food to families in need. No experience necessary - training provided.",
+          date: "This Saturday",
+          time: "9:00 AM - 12:00 PM",
+          duration: "short",
+          distance: "2.3 miles",
+          skills: "None required",
+          contact: "volunteer@afac.org",
+        },
+        {
+          id: 2,
+          title: "Reading Tutor for Kids",
+          organization: "Boys & Girls Club",
+          category: "education",
+          description:
+            "Work one-on-one with elementary students to improve their reading skills. Perfect for teachers, students, or anyone who loves working with kids.",
+          date: "Weekdays",
+          time: "4:00 PM - 6:00 PM",
+          duration: "ongoing",
+          distance: "1.8 miles",
+          skills: "Good communication",
+          contact: "programs@bgcarlington.org",
+        },
+        {
+          id: 3,
+          title: "River Cleanup Event",
+          organization: "Potomac Conservancy",
+          category: "environment",
+          description:
+            "Join us for a community river cleanup along the Potomac. Help remove trash and invasive plants while enjoying the outdoors.",
+          date: "August 10th",
+          time: "8:00 AM - 1:00 PM",
+          duration: "medium",
+          distance: "4.7 miles",
+          skills: "Comfortable outdoors",
+          contact: "events@potomac.org",
+        },
+        {
+          id: 4,
+          title: "Senior Center Helper",
+          organization: "Arlington Senior Services",
+          category: "seniors",
+          description:
+            "Assist with recreational activities, serve meals, and provide companionship to elderly residents.",
+          date: "Multiple dates available",
+          time: "Various times",
+          duration: "medium",
+          distance: "3.2 miles",
+          skills: "Patient and friendly",
+          contact: "volunteer@arlingtonseniors.org",
+        },
+        {
+          id: 5,
+          title: "Animal Shelter Assistant",
+          organization: "Animal Welfare League",
+          category: "animals",
+          description:
+            "Help care for rescued animals - feeding, cleaning, socializing, and basic medical care assistance.",
+          date: "Daily opportunities",
+          time: "Morning or evening shifts",
+          duration: "short",
+          distance: "6.1 miles",
+          skills: "Love for animals",
+          contact: "volunteer@awla.org",
+        },
+        {
+          id: 6,
+          title: "Community Garden Volunteer",
+          organization: "Green Arlington Initiative",
+          category: "environment",
+          description:
+            "Help maintain community gardens, teach sustainable farming, and harvest produce for local food banks.",
+          date: "Every Sunday",
+          time: "10:00 AM - 2:00 PM",
+          duration: "long",
+          distance: "2.9 miles",
+          skills: "Interest in gardening",
+          contact: "gardens@greenarlington.org",
+        },
+        {
+          id: 7,
+          title: "Health Fair Volunteer",
+          organization: "Arlington Community Health Center",
+          category: "health",
+          description:
+            "Assist with health screenings, registration, and information booths at our monthly community health fair.",
+          date: "First Saturday of month",
+          time: "7:00 AM - 3:00 PM",
+          duration: "long",
+          distance: "1.5 miles",
+          skills: "Bilingual preferred",
+          contact: "healthfair@achc.org",
+        },
+        {
+          id: 8,
+          title: "Disaster Relief Training",
+          organization: "American Red Cross",
+          category: "disaster",
+          description:
+            "Get certified in disaster response and help your community prepare for emergencies. Training provided.",
+          date: "Next training: Aug 15",
+          time: "9:00 AM - 5:00 PM",
+          duration: "long",
+          distance: "5.3 miles",
+          skills: "Commitment to training",
+          contact: "training@redcross.org",
+        },
+        {
+          id: 9,
+          title: "Homework Helper",
+          organization: "Arlington Public Library",
+          category: "education",
+          description:
+            "Provide homework assistance and tutoring for middle and high school students in our after-school program.",
+          date: "Monday-Thursday",
+          time: "3:30 PM - 6:00 PM",
+          duration: "ongoing",
+          distance: "2.1 miles",
+          skills: "High school diploma+",
+          contact: "volunteer@arlingtonlibrary.org",
+        },
+        {
+          id: 10,
+          title: "Meals on Wheels Driver",
+          organization: "Senior Services of Northern Virginia",
+          category: "seniors",
+          description:
+            "Deliver nutritious meals to homebound seniors. Routes take 2-3 hours and provide vital social connection.",
+          date: "Flexible schedule",
+          time: "11:00 AM - 2:00 PM typical",
+          duration: "short",
+          distance: "Various locations",
+          skills: "Valid driver's license",
+          contact: "meals@ssnova.org",
+        },
+        {
+          id: 11,
+          title: "Youth Mentor",
+          organization: "Big Brothers Big Sisters",
+          category: "education",
+          description:
+            "Be a positive role model for at-risk youth through regular one-on-one mentoring activities and support.",
+          date: "Ongoing commitment",
+          time: "4-6 hours per month",
+          duration: "ongoing",
+          distance: "Multiple locations",
+          skills: "Background check required",
+          contact: "mentor@bbbs-nova.org",
+        },
+        {
+          id: 12,
+          title: "Hospital Companion",
+          organization: "Virginia Hospital Center",
+          category: "health",
+          description:
+            "Provide comfort and companionship to patients and families in the hospital. Help with non-medical tasks and emotional support.",
+          date: "Multiple shifts available",
+          time: "Various 4-hour shifts",
+          duration: "medium",
+          distance: "1.2 miles",
+          skills: "Compassionate nature",
+          contact: "volunteer@vhc.org",
+        },
+      ];
+
+      let currentOpportunities = [...sampleOpportunities];
+
+      function getLocation() {
+        const statusIndicator = document.getElementById("statusIndicator");
+        statusIndicator.style.display = "flex";
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              // In a real app, you'd reverse geocode these coordinates
+              document.getElementById("locationInput").value =
+                "Current Location";
+              statusIndicator.style.display = "none";
+              searchOpportunities();
+            },
+            function (error) {
+              statusIndicator.style.display = "none";
+              alert("Unable to get your location. Please enter it manually.");
+            }
+          );
+        } else {
+          statusIndicator.style.display = "none";
+          alert("Geolocation is not supported by this browser.");
+        }
+      }
+
+      function searchOpportunities() {
+        const location = document.getElementById("locationInput").value;
+        if (!location.trim()) {
+          alert("Please enter a location");
+          return;
+        }
+
+        const statusIndicator = document.getElementById("statusIndicator");
+        statusIndicator.style.display = "flex";
+
+        // Simulate API call delay
+        setTimeout(() => {
+          document.getElementById(
+            "userLocation"
+          ).textContent = `Near ${location}`;
+          renderOpportunities();
+          statusIndicator.style.display = "none";
+        }, 1500);
+      }
+
+      function filterOpportunities() {
+        const category = document.getElementById("categoryFilter").value;
+        const distance = parseInt(
+          document.getElementById("distanceFilter").value
+        );
+        const timeCommitment = document.getElementById("timeFilter").value;
+        const dateRange = document.getElementById("dateFilter").value;
+
+        currentOpportunities = sampleOpportunities.filter((opp) => {
+          if (category && opp.category !== category) return false;
+          if (timeCommitment && opp.duration !== timeCommitment) return false;
+          // In a real app, you'd filter by actual distance and date
+          return true;
+        });
+
+        renderOpportunities();
+      }
+
+      function renderOpportunities() {
+        const container = document.getElementById("opportunitiesContainer");
+        const countElement = document.getElementById("resultsCount");
+
+        countElement.textContent = `${currentOpportunities.length} volunteer opportunities found`;
+
+        container.innerHTML = currentOpportunities
+          .map(
+            (opp) => `
+                <div class="opportunity-card" onclick="viewOpportunity(${
+                  opp.id
+                })">
+                    <div class="opportunity-header">
+                        <div class="opportunity-title">
+                            <h3>${opp.title}</h3>
+                            <div class="organization">${opp.organization}</div>
+                        </div>
+                        <div class="category-badge">${getCategoryName(
+                          opp.category
+                        )}</div>
+                    </div>
+                    
+                    <div class="opportunity-details">
+                        <div class="detail-item">
+                            <svg class="detail-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                            </svg>
+                            ${opp.date}
+                        </div>
+                        <div class="detail-item">
+                            <svg class="detail-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                            </svg>
+                            ${opp.time}
+                        </div>
+                        <div class="detail-item">
+                            <svg class="detail-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            ${opp.distance}
+                        </div>
+                        <div class="detail-item">
+                            <svg class="detail-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            ${opp.skills}
+                        </div>
+                    </div>
+                    
+                    <div class="opportunity-description">
+                        ${opp.description}
+                    </div>
+                    
+                    <div class="opportunity-actions">
+                        <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); applyToOpportunity(${
+                          opp.id
+                        })">Apply Now</button>
+                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); saveOpportunity(${
+                          opp.id
+                        })">Save for Later</button>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function getCategoryName(category) {
+        const categories = {
+          education: "Education",
+          environment: "Environment",
+          health: "Health & Wellness",
+          community: "Community Service",
+          seniors: "Senior Care",
+          animals: "Animal Welfare",
+          disaster: "Disaster Relief",
+        };
+        return categories[category] || category;
+      }
+
+      function viewOpportunity(id) {
+        const opp = sampleOpportunities.find((o) => o.id === id);
+        alert(
+          `Viewing: ${opp.title}\n\nContact: ${opp.contact}\n\nIn a real app, this would open a detailed view with more information, photos, requirements, and application process.`
+        );
+      }
+
+      function applyToOpportunity(id) {
+        const opp = sampleOpportunities.find((o) => o.id === id);
+        alert(
+          `Applying to: ${opp.title}\n\nIn a real app, this would either:\n1. Redirect to the organization's application page\n2. Open an in-app application form\n3. Send an email to ${opp.contact}`
+        );
+      }
+
+      function saveOpportunity(id) {
+        alert(
+          "Opportunity saved! In a real app, this would be saved to your profile for easy access later."
+        );
+      }
+
+      // Initialize the app
+      document.addEventListener("DOMContentLoaded", function () {
+        renderOpportunities();
+      });
+    </script>
+  </body>
+</html>
